@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Teaching Assistant - RAG System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            font-size: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .response-area {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .response-area.show {
+            display: block;
+        }
+
+        .response-area h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .response-area p {
+            color: #333;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .sources {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        .source-item {
+            background: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .chat-history {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .chat-message.question {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+
+        .chat-message.answer {
+            background: #f3e5f5;
+            border-left: 4px solid #9c27b0;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 AI Teaching Assistant</h1>
+            <p>Powered by RAG (Retrieval-Augmented Generation) Architecture</p>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <h2><span class="icon">💬</span> Ask a Question</h2>
+                
+                <div id="status" class="status"></div>
+                
+                <div class="chat-history" id="chatHistory"></div>
+                
+                <div class="input-group">
+                    <label for="question">Your Question:</label>
+                    <textarea 
+                        id="question" 
+                        placeholder="Ask anything about the course materials..."
+                        rows="4"
+                    ></textarea>
+                </div>
+
+                <button class="btn" id="askBtn" onclick="askQuestion()">
+                    Ask Teaching Assistant
+                </button>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 10px; color: #667eea;">Thinking...</p>
+                </div>
+
+                <div class="response-area" id="responseArea">
+                    <h3>📝 Answer:</h3>
+                    <p id="answer"></p>
+                    <div class="sources" id="sources"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let chatHistory = [];
+
+        async function askQuestion() {
+            const questionInput = document.getElementById('question');
+            const question = questionInput.value.trim();
+            
+            if (!question) {
+                showStatus('Please enter a question', 'error');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('askBtn').disabled = true;
+            document.getElementById('responseArea').classList.remove('show');
+
+            try {
+                const response = await fetch('/api/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayResponse(data);
+                    addToChatHistory(question, data.answer);
+                    questionInput.value = '';
+                    showStatus('Response generated successfully!', 'success');
+                } else {
+                    showStatus(data.error || 'Error getting response', 'error');
+                }
+            } catch (error) {
+                showStatus('Network error: ' + error.message, 'error');
+            } finally {
+                document.getElementById('loading').classList.remove('show');
+                document.getElementById('askBtn').disabled = false;
+            }
+        }
+
+        function displayResponse(data) {
+            const answerEl = document.getElementById('answer');
+            const sourcesEl = document.getElementById('sources');
+            const responseArea = document.getElementById('responseArea');
+
+            answerEl.textContent = data.answer;
+
+            // Display sources
+            if (data.sources && data.sources.length > 0) {
+                sourcesEl.innerHTML = '<h4 style="color: #667eea; margin-bottom: 10px;">📚 Sources:</h4>';
+                data.sources.forEach((source, index) => {
+                    const sourceDiv = document.createElement('div');
+                    sourceDiv.className = 'source-item';
+                    sourceDiv.innerHTML = `
+                        <strong>Source ${index + 1}:</strong><br>
+                        ${source.content}
+                    `;
+                    sourcesEl.appendChild(sourceDiv);
+                });
+            } else {
+                sourcesEl.innerHTML = '';
+            }
+
+            responseArea.classList.add('show');
+        }
+
+        function addToChatHistory(question, answer) {
+            const historyEl = document.getElementById('chatHistory');
+            
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'chat-message question';
+            questionDiv.innerHTML = `<strong>Q:</strong> ${question}`;
+            
+            const answerDiv = document.createElement('div');
+            answerDiv.className = 'chat-message answer';
+            answerDiv.innerHTML = `<strong>A:</strong> ${answer.substring(0, 200)}${answer.length > 200 ? '...' : ''}`;
+            
+            historyEl.appendChild(questionDiv);
+            historyEl.appendChild(answerDiv);
+            
+            historyEl.scrollTop = historyEl.scrollHeight;
+        }
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type} show`;
+            
+            setTimeout(() => {
+                statusEl.classList.remove('show');
+            }, 5000);
+        }
+
+        // Allow Enter key to submit (Shift+Enter for new line)
+        document.getElementById('question').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                askQuestion();
+            }
+        });
+
+        // Check health on load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                
+                if (data.knowledge_base_loaded) {
+                    showStatus('Knowledge base loaded and ready!', 'success');
+                } else {
+                    showStatus('Warning: No knowledge base loaded. Please upload course materials.', 'error');
+                }
+            } catch (error) {
+                showStatus('Error connecting to server', 'error');
+            }
+        });
+    </script>
+</body>
+</html>
