@@ -1,0 +1,34 @@
+ Discussed Architecture and Techniques
+Introduction
+In today’s class, we explored the architecture of integrating large language models (LLMs) into systems, specifically for enhancing the teaching assistant experience on platforms like Scalar. We examined the framework known as RAG (Retrieval-Augmented Generation) and its implementation using the Langchain framework, along with associated concepts like document loading, text splitting, embedding creation, and similarity searches.
+
+RAG (Retrieval-Augmented Generation) Architecture
+RAG is a technique to optimize the output generation by an LLM, incorporating external domain-specific knowledge. Here is how RAG operates:
+
+Document Loading: Documents can be loaded from multiple sources such as YouTube videos, Wikipedia, or PDFs. In the Langchain framework, this involves using loaders like the YouTube transcription loader or the PDF loader【4:7†transcript.txt】.
+
+Text Splitting: Large documents are split into smaller chunks to facilitate efficient retrieval and indexing. Recursive text chunking sometimes involves overlapping to preserve context【4:10†transcript.txt】【4:19†transcript.txt】.
+
+Vector Storage and Embedding: Documents are stored in vector stores, where embeddings for document text are created using models like OpenAI embeddings. These embeddings help in matching document content with user queries effectively【4:10†transcript.txt】【4:19†transcript.txt】.
+
+Retrieval and Similarity Search: Techniques such as cosine similarity or dot product are employed to find similarities between user queries and document embeddings. This step ensures that relevant documents are retrieved based on the query【4:11†transcript.txt】.
+
+Response Generation: Once relevant documents are retrieved, tools like ChatGPT construct the final text response based on provided prompts and document context【4:16†transcript.txt】.
+
+Analogies and Case Studies
+FAISS: Facebook AI Similarity Search is likened to a library storing dense vectors for fast similarity searches, akin to organizing books in a library based on subjects for quick lookup【4:1†transcript.txt】.
+
+Embedding Techniques: The use of embeddings helps associate and retrieve relevant chunks of text based on query similarity, much like identifying books in a library section based on topics【4:10†transcript.txt】.
+
+Backend Implementation in Teaching Assistants
+The LLMs are used as first-level teaching assistants to provide immediate and descriptive feedback, reducing reliance on human TAs. The system design allows handling user requests, leveraging LLMs to interact via tools like ChatGPT for responses based on previously loaded and processed data【4:6†transcript.txt】【4:13†transcript.txt】.
+
+Challenges and Considerations
+Cost and Efficiency: Training LLMs and processing user queries involves infrastructure costs, highlighting the need for efficient use of server resources【4:4†transcript.txt】.
+
+Accuracy and Customization: Improving transcription accuracy in specific domains (e.g., medical jargon) using tools like AWS Transcribe enhances the system's robustness【4:19†transcript.txt】.
+
+Conclusion
+The class covered RAG and its architecture for improving response accuracy and speed in educational platforms. The discussed methods show potential for wide applications beyond teaching assistants, showcasing the significant impact of integrating LLMs in solving real-world problems efficiently.
+
+By understanding these concepts, learners can appreciate the sophisticated backend processes that help create intelligent and responsive systems.
