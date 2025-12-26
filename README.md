@@ -1,4 +1,4 @@
-# Lecture 11: AI Teaching Assistant - RAG Architecture and System Design
+## AI Teaching Assistant - RAG Architecture and System Design
 
 ## Overview
 This lecture explores the complete system design and architecture for building an **AI-powered Teaching Assistant** using Large Language Models (LLMs) and the **RAG (Retrieval-Augmented Generation)** framework. The system is designed to provide immediate, descriptive feedback to students on platforms like Scalar, reducing dependency on human TAs.
@@ -369,3 +369,4 @@ The AI Teaching Assistant system using RAG architecture demonstrates:
 ---
 
 *By understanding these concepts, learners can appreciate the sophisticated backend processes that help create intelligent and responsive AI systems for education and beyond.*
+
